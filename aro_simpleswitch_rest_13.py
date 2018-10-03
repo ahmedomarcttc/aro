@@ -146,18 +146,12 @@ class ARORYUController13(app_manager.RyuApp):
     @set_ev_cls(EventSwitchEnter)
     def handler_switch_enter(self, ev):
         self.logger.info("Switch detected")
-        # print([switch.dp.id for switch in get_switch(self)])
-        # print(get_switch(self, None)[0].dp.ports)
-        # print(get_switch(self, None)[0].ports)
-        # print(get_switch(self, None)[0].to_dict())
         self.topo_blueprint.topo_raw_switches = get_switch(self, None)
-        # self.logger.info(self.topo_blueprint.print_switches())
 
     @set_ev_cls(EventLinkAdd)
     def handler_link_add(self, ev):
         self.logger.info("Link detected")
         self.topo_blueprint.topo_raw_links = get_link(self, None)
-        # self.logger.info(self.topo_blueprint.print_links())
 
     @set_ev_cls(EventSwitchLeave, [MAIN_DISPATCHER, CONFIG_DISPATCHER, DEAD_DISPATCHER])
     def handler_switch_leave(self, ev):
@@ -171,43 +165,20 @@ class TopologyBlueprint(object):
         self.topo_links = []
 
     def print_switches(self):
-        # print(self.topo_raw_switches)
         self.topo_switches = [switch.dp.id for switch in self.topo_raw_switches]
         return self.topo_switches
 
     def print_links(self):
-        # print(dir(self.topo_raw_links))
         print(dir(self.topo_raw_links))
         self.topo_links = [(link.src.dpid, {'port no':link.src.port_no, 'port name':link.src.name},
                             link.dst.dpid, {'port no':link.dst.port_no, 'port name':link.dst.name})
                             for link in self.topo_raw_links]
-        # print(dir(link.src), dir(link.dst))
-        # print(link.src.name, link.dst.name)
         return self.topo_links
 
     def diesect_switch(self):
         pass
 
     def get_switches_info(self):
-        """
-        Returns a list of switch dpids.
-        The switches are learned when they are joined using dpid.
-        :rtype : list
-        """
-        # sw_info_dict = {}
-
-        # for sw in self.topo_raw_switches:
-            # sw_info_dict.update(
-            #     {
-            #         sw.dp.ports[4294967294].name : {
-            #             'dpid' : sw.dp.id,
-            #             'mac address' : sw.dp.ports[4294967294].hw_addr,
-            #             'active intf' : [swport.name for swkey, swport in sw.dp.ports.iteritems() if swkey != 4294967294 ]
-            #         }
-            #     }
-            # ) #sw.dp.ports[4294967294].to_jsondict()
-        # return sw_info_dict
-
         sw_info_list = []
         for sw in self.topo_raw_switches:
             sw_info_list.append(
@@ -221,13 +192,9 @@ class TopologyBlueprint(object):
         return sw_info_list
 
     def get_links_info(self):
-        """
-        Uses the built in __str__ function to print the links saved in the class `topo_raw_links`.
-        Returns a list of link strings
-        """
         out = []
         for l in self.topo_raw_links:
-            out.append(#str(l.src.name).split('-')[0]
+            out.append(
                 {
                     'ep1' : {
                         'interface' : l.src.name,
