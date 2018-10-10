@@ -20,15 +20,12 @@ def vim():
 class VIM(Resource):
     def get(self):
         LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
+        status = {}
         try:
             for dckey, dcvalue in vim().iteritems():
-                # print(dir(dcvalue))
-                print(dcvalue.containers)
                 for vnfkey, vnfvalue in dcvalue.containers.iteritems():
-                    print(dir(vnfvalue))
-                    # print(vnfvalue)
-                    return { 'get status' : vnfvalue.getStatus(),
-                             'get net status' : vnfvalue.getNetworkStatus() }
+                    status.update({ '{} status'.format(vnfkey) : vnfvalue.getStatus() })
+            return status
         except Exception as ex:
             logging.exception("API error.")
             return ex.message, 500, CORS_HEADER
