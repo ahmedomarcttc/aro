@@ -8,13 +8,13 @@ from gevent.pywsgi import WSGIServer
 import wim
 from wim import WIM, Switches, Links
 
-from wim_ryu import WIMRyu 
+from wim_ryu import WIMRyu
 
 import vim
 from vim import VIM
 
-logging.basicConfig()
-
+LOG = logging.getLogger("aro.endpoint")
+LOG.setLevel(logging.DEBUG)
 
 class Endpoint(object):
     """
@@ -29,9 +29,7 @@ class Endpoint(object):
 
         self.app = Flask(__name__)
         self.api = Api(self.app)
-        print("Created ARO API endpoint {}({}:{})".format(
-            self.__class__.__name__, self.ip, self.port))
-        logging.debug("Created ARO API endpoint {}({}:{})".format(
+        LOG.info("Created ARO API endpoint {}({}:{})".format(
             self.__class__.__name__, self.ip, self.port))
 
         # self.api.add_resource(
@@ -46,24 +44,20 @@ class Endpoint(object):
 
     def connectWIM(self, WIMnetwork):
         wim.net = WIMnetwork
-        print("Connected WIMNetwork to API endpoint {}({}:{})".format(
-            self.__class__.__name__, self.ip, self.port))
-        logging.info("Connected WIMNetwork to API endpoint {}({}:{})".format(
+        LOG.info("Connected WIMNetwork to API endpoint {}({}:{})".format(
             self.__class__.__name__, self.ip, self.port))
 
     def connectVIM(self, dc):
         vim.dcs[dc.label] = dc
-        print("Connected DC({}) to API endpoint {}({}:{})".format(
-            dc.label, self.__class__.__name__, self.ip, self.port))
-        logging.info("Connected DC({}) to API endpoint {}({}:{})".format(
+        LOG.info("Connected DC({}) to API endpoint {}({}:{})".format(
             dc.label, self.__class__.__name__, self.ip, self.port))
 
     def start(self):
         self.thread = threading.Thread(target=self._start_flask, args=())
         self.thread.daemon = True
         self.thread.start()
-        print("Started API endpoint @ http://{}:{}".format(self.ip, self.port))
-        logging.info("Started API endpoint @ http://{}:{}".format(self.ip, self.port))
+        LOG.info("Started API endpoint @ http://{}:{}".format(
+            self.ip, self.port))
 
     def stop(self):
         if self.http_server:

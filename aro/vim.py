@@ -2,7 +2,8 @@ import logging
 from flask_restful import Resource
 from flask import request
 
-logging.basicConfig()
+LOG = logging.getLogger("aro.endpoint.vim")
+LOG.setLevel(logging.DEBUG)
 
 CORS_HEADER = {'Access-Control-Allow-Origin': '*'}
 
@@ -18,7 +19,7 @@ def vim():
 
 class VIM(Resource):
     def get(self):
-        logging.debug("API CALL: WIM")
+        LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
         try:
             for dckey, dcvalue in vim().iteritems():
                 # print(dir(dcvalue))

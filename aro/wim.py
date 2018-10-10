@@ -3,7 +3,8 @@ from flask_restful import Resource
 from flask import request
 import requests
 
-logging.basicConfig()
+LOG = logging.getLogger("aro.endpoint.wim")
+LOG.setLevel(logging.DEBUG)
 
 CORS_HEADER = {'Access-Control-Allow-Origin': '*'}
 
@@ -44,7 +45,7 @@ def wim():
 
 class WIM(Resource):
     def get(self):
-        logging.debug("API CALL: WIM")
+        LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
         try:
             return wim()
         except Exception as ex:
@@ -52,8 +53,8 @@ class WIM(Resource):
             return ex.message, 500, CORS_HEADER
 
 class Switches(Resource):
-    logging.debug("API CALL: Switches")
     def get(self):
+        LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
         try:
             return wim()['Switches']
         except Exception as ex:
@@ -61,8 +62,8 @@ class Switches(Resource):
             return ex.message, 500, CORS_HEADER
 
 class Links(Resource):
-    logging.debug("API CALL: Links")
     def get(self):
+        LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
         try:
             return wim()['Links']
         except Exception as ex:

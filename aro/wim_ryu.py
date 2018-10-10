@@ -3,7 +3,8 @@ import requests
 from flask_restful import Resource
 from json import loads, dumps
 
-logging.basicConfig()
+LOG = logging.getLogger("aro.endpoint.vim-ryu")
+LOG.setLevel(logging.DEBUG)
 
 CORS_HEADER = {'Access-Control-Allow-Origin': '*'}
 
@@ -12,7 +13,7 @@ API = "http://127.0.0.1:8080"
 
 class WIMRyu(Resource):
     def get(self):
-        logging.debug("API CALL: WIM")
+        LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
         try:
             wim = self._switches(), self._links()
             return { 'WIM' : wim }
