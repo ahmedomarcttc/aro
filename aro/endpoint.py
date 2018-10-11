@@ -27,6 +27,8 @@ class Endpoint(object):
         self.ip = listenip
         self.port = port
 
+        self.net = DCnetwork
+
         self.app = Flask(__name__)
         self.api = Api(self.app)
         LOG.info("Created ARO API endpoint {}({}:{})".format(
@@ -42,8 +44,8 @@ class Endpoint(object):
 
         self.api.add_resource(VIM, "/aro/vim")
 
-    def connectWIM(self, WIMnetwork):
-        wim.net = WIMnetwork
+    def connectWIM(self):
+        wim.net = self.net
         LOG.info("Connected WIMNetwork to API endpoint {}({}:{})".format(
             self.__class__.__name__, self.ip, self.port))
 
