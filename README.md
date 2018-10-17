@@ -52,14 +52,6 @@ Changes to net.py
 Changes to node.py
 
   class EmulatorCompute(Docker):
-    """
-    Emulator specific compute node class.
-    Inherits from Containernet's Docker host class.
-    Represents a single container connected to a (logical)
-    data center.
-    We can add emulator specific helper functions to it.
-    """
-
     def __init__(
             self, name, dimage, **kwargs):
         self.datacenter = kwargs.get("datacenter")  # pointer to current DC
