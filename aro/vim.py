@@ -9,15 +9,10 @@ CORS_HEADER = {'Access-Control-Allow-Origin': '*'}
 
 dcs = {}
 
-def switchselector(dcname):
-    global dcs
-    print('this is {} with switches {}'.format(dcs[dcname].name, dcs[dcname].switch))
-    return dcs[dcname].switch
-
 def vim():
     return dcs
 
-class VIM(Resource):
+class Hosts(Resource):
     def get(self):
         LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
         status = {}
@@ -30,5 +25,15 @@ class VIM(Resource):
             logging.exception("API error.")
             return ex.message, 500, CORS_HEADER
 
-class Hosts(Resource):
-    pass
+class VIM(Resource):
+    def get(self):
+        LOG.debug("API CALL: %s GET" % str(self.__class__.__name__))
+        status = {}
+        try:
+            for dckey, dcvalue in vim().iteritems():
+                vnfs = [vnf.name for vnf in dcvalue.containers.itervalues()]
+                status.update({ dckey : vnfs })
+            return status
+        except Exception as ex:
+            logging.exception("API error.")
+            return ex.message, 500, CORS_HEADER

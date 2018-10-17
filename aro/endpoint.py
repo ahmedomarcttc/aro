@@ -11,23 +11,21 @@ from wim import WIM, Switches, Links
 from wim_ryu import WIMRyu
 
 import vim
-from vim import VIM
+from vim import VIM, Hosts
 
 LOG = logging.getLogger("aro.endpoint")
 LOG.setLevel(logging.DEBUG)
 
 class Endpoint(object):
     """
-    Simple API endpoint that offers a REST
-    interface. This interface will be used by the
-    default command line client.
+    Simple API endpoint that offers a REST interface.
     """
 
     def __init__(self, listenip, port, DCnetwork=None):
         self.ip = listenip
         self.port = port
 
-        self.net = DCnetwork
+        self.connectWIM(DCnetwork)
 
         self.app = Flask(__name__)
         self.api = Api(self.app)
@@ -43,9 +41,10 @@ class Endpoint(object):
         self.api.add_resource(WIMRyu, "/aro-ryu/wim")
 
         self.api.add_resource(VIM, "/aro/vim")
+        self.api.add_resource(Hosts, "/aro/hosts")
 
-    def connectWIM(self):
-        wim.net = self.net
+    def connectWIM(self, net):
+        wim.net = net
         LOG.info("Connected WIMNetwork to API endpoint {}({}:{})".format(
             self.__class__.__name__, self.ip, self.port))
 
