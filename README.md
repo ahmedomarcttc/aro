@@ -51,40 +51,39 @@ Changes to net.py
 
 Changes to node.py
 
-  class EmulatorCompute(Docker):
-    def __init__(
-            self, name, dimage, **kwargs):
-        self.datacenter = kwargs.get("datacenter")  # pointer to current DC
-        self.flavor_name = kwargs.get("flavor_name")
-        self.connected_sw = kwargs.get("connected_sw")
-        LOG.debug("Starting compute instance %r in data center %r" %
-                  (name, str(self.datacenter)))
-        # call original Docker.__init__
-        Docker.__init__(self, name, dimage, **kwargs)
+    class EmulatorCompute(Docker):
+      def __init__(
+              self, name, dimage, **kwargs):
+          self.datacenter = kwargs.get("datacenter")  # pointer to current DC
+          self.flavor_name = kwargs.get("flavor_name")
+          self.connected_sw = kwargs.get("connected_sw")
+          LOG.debug("Starting compute instance %r in data center %r" %
+                    (name, str(self.datacenter)))
+          # call original Docker.__init__
+          Docker.__init__(self, name, dimage, **kwargs)
 
-    def getNetworkStatus(self):
-        """
-        Helper method to receive information about the virtual networks
-        this compute instance is connected to.
-        """
-        # get all links and find dc switch interface
-        networkStatusList = []
-        for i in self.intfList():
-            vnf_name = self.name
-            vnf_interface = str(i)
-            dc_port_name = self.datacenter.net.find_connected_dc_interface(
-                vnf_name, vnf_interface)
-            connected_sw = self.connected_sw.name
-            # format list of tuples (name, Ip, MAC, isUp, status, dc_portname)
-            intf_dict = {'intf_name': str(i), 'ip': "{0}/{1}".format(i.IP(), i.prefixLen), 'netmask': i.prefixLen,
-                         'mac': i.MAC(), 'up': i.isUp(), 'status': i.status(), 'dc_portname': dc_port_name,
-                         'Connect to switch': connected_sw}
-            networkStatusList.append(intf_dict)
+      def getNetworkStatus(self):
+          """
+          Helper method to receive information about the virtual networks
+          this compute instance is connected to.
+          """
+          # get all links and find dc switch interface
+          networkStatusList = []
+          for i in self.intfList():
+              vnf_name = self.name
+              vnf_interface = str(i)
+              dc_port_name = self.datacenter.net.find_connected_dc_interface(
+                  vnf_name, vnf_interface)
+              connected_sw = self.connected_sw.name
+              # format list of tuples (name, Ip, MAC, isUp, status, dc_portname)
+              intf_dict = {'intf_name': str(i), 'ip': "{0}/{1}".format(i.IP(), i.prefixLen), 'netmask': i.prefixLen,
+                           'mac': i.MAC(), 'up': i.isUp(), 'status': i.status(), 'dc_portname': dc_port_name,
+                           'Connect to switch': connected_sw}
+              networkStatusList.append(intf_dict)
 
-        return networkStatusList
+          return networkStatusList
 
     class Datacenter(object):
-
         def __init__(self, label, metadata={}, resource_log_path=None):
             # first prototype assumes one "bigswitch" per DC
             self.switch = []
