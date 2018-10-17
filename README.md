@@ -21,6 +21,5 @@ def addLink(self, node1, node2, **params):
           node2 = node2.gw
       # try to give containers a default IP
 
-****
 
 Changes to node.py
