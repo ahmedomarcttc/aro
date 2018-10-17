@@ -5,8 +5,8 @@ For placement engine
 
 Changes to net.py
 
-def addLink(self, node1, node2, **params):
-
+    def addLink(self, node1, node2, **params):
+    
       # ensure type of node1
       if isinstance(node1, basestring):
           if node1 in self.dcs:
