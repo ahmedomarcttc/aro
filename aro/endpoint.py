@@ -32,8 +32,6 @@ class Endpoint(object):
         LOG.info("Created ARO API endpoint {}({}:{})".format(
             self.__class__.__name__, self.ip, self.port))
 
-        # self.api.add_resource(
-        #     Compute, "/restapi/compute/<dc_label>/<compute_name>")
         self.api.add_resource(WIM, "/aro/wim")
         self.api.add_resource(Switches, "/aro/switches")
         self.api.add_resource(Links, "/aro/links")

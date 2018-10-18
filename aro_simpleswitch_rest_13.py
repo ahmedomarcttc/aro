@@ -169,7 +169,6 @@ class TopologyBlueprint(object):
         return self.topo_switches
 
     def print_links(self):
-        print(dir(self.topo_raw_links))
         self.topo_links = [(link.src.dpid, {'port no':link.src.port_no, 'port name':link.src.name},
                             link.dst.dpid, {'port no':link.dst.port_no, 'port name':link.dst.name})
                             for link in self.topo_raw_links]

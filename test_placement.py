@@ -102,7 +102,6 @@ class Topology(DCNetwork):
 
     def _connect_aro(self):
         self.aro = Endpoint("0.0.0.0", 2284, DCnetwork=self)
-        self.aro.connectWIM()
         self.aro.connectVIM(self.dc1)
         self.aro.connectVIM(self.dc2)
 

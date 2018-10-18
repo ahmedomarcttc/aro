@@ -1,6 +1,5 @@
 import logging
 from flask_restful import Resource
-from flask import request
 
 LOG = logging.getLogger("aro.endpoint.vim")
 LOG.setLevel(logging.DEBUG)
