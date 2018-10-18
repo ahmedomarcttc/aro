@@ -30,7 +30,7 @@ class demotopo(DCNetwork):
         Initialize multi PoP emulator network.
         """
         super(demotopo, self).__init__(
-            monitor=True,
+            monitor=False,
             enable_learning=True
         )
         # define members for later use
