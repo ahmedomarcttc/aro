@@ -5,7 +5,17 @@ For placement engine
 
 Changes to net.py
 
-    def addLink(self, node1, node2, **params):
+  def addDatacenter(self, label, topo=None, sw_param, metadata={}, resource_log_path=None):
+      if label in self.dcs:
+        raise Exception("Data center label already exists: %s" % label)
+      dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
+      dc.net = self  # set reference to network
+      self.dcs[label] = dc
+      dc.create(topo, sw_param)  # finally create the data center in our Mininet instance
+      LOG.info("added data center: %s" % label)
+      return dc
+
+    def addLink(self, node1, node2, \*\*params):
       # ensure type of node1
       if isinstance(node1, basestring):
           if node1 in self.dcs:
@@ -72,19 +82,47 @@ Changes to node.py
           return networkStatusList
 
     class Datacenter(object):
+
+    DC_COUNTER = 0
         def __init__(self, label, metadata={}, resource_log_path=None):
+            self.net = None  # DCNetwork to which we belong
+            # each node (DC) has a short internal name used by Mininet
+            # this is caused by Mininets naming limitations for swtiches etc.
+            Datacenter.DC_COUNTER += 1
+            self.name = "dc%d" % Datacenter.DC_COUNTER
+            # creating unique dpid for switches
+            self.DCDPID_BASE1 = 1000 * Datacenter.DC_COUNTER
+            self.counter = 0
             # first prototype assumes one "bigswitch" per DC
             self.switch = []
             self.gw = None
-            # keep track of running containers
-            self.containers = {}
-            # keep track of attached external access points
-            self.extSAPs = {}
             # pointer to assigned resource model
             self._resource_model = None
 
+        def _get_next_dc_dpid(self):
+            self.counter += 1
+            return self.DCDPID_BASE1 + self.counter
 
-        def create(self):
+        def star_topo(self, numswitch):
+            for i in range(numswitch):
+                self.switch.append(self.net.addSwitch("{}.s{}".format(self.name, i+1), dpid=hex(self._get_next_dc_dpid())[2:]))
+                LOG.debug("created data center switch: %s" % str(self.switch[i]))
+                self._RM_switch[str(self.switch[i])] = self.counter
+                self.net.addLink(self.gw, self.switch[i])
+
+        def mesh_topo(self, numswitch):
+            for i in range(numswitch):
+                self.switch.append(self.net.addSwitch("{}.s{}".format(self.name, i+1), dpid=hex(self._get_next_dc_dpid())[2:]))
+                LOG.debug("created data center switch: %s" % str(self.switch[i]))
+                self._RM_switch[str(self.switch[i])] = self.counter
+                self.net.addLink(self.gw, self.switch[i])
+                for j in range(i):
+                    self.net.addLink(self.switch[j], self.switch[i])
+
+        def grid_topo(self, grid_dim):
+            pass
+
+        def create(self, topo, sw_param):
             """
             Each data center is represented by a single switch to which
             compute resources can be connected at run time.
@@ -93,14 +131,18 @@ Changes to node.py
             per data center
             """
             self.gw = self.net.addSwitch("%s.gw" % self.name, dpid=hex(self._get_next_dc_dpid())[2:])
-            LOG.debug("created data center gateway: %s" % str(self.gw))
+            LOG.debug("created data center gateway switch: %s" % str(self.gw))
 
-            self.switch.append(self.net.addSwitch("%s.s1" % self.name, dpid=hex(self._get_next_dc_dpid())[2:]))
-            LOG.debug("created data center switch: %s" % str(self.switch))
-
-            for switch in self.switch:
-                LOG.debug("created data center switch: %s" % str(switch))
-                self.net.addLink(self.gw, switch, cls=Link)
+            if topo is 'star':
+                self.star_topo(sw_param)
+            elif topo == 'mesh':
+                self.mesh_topo(sw_param)
+            elif topo == 'grid':
+                self.grid_topo(sw_param)
+            else:
+                self.switch.append(self.net.addSwitch("{}.s1".format(self.name), dpid=hex(self._get_next_dc_dpid())[2:]))
+                LOG.debug("created data center switch: %s" % str(self.switch[0]))
+                self.net.addLink(self.gw, self.switch[0])
 
         def startCompute(self, name, image=None, command=None, network=None,
                          flavor_name="tiny", connected_sw=None, properties=dict(), **params):
