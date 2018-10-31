@@ -12,7 +12,7 @@ def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_l
     dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
     dc.net = self  # set reference to network
     self.dcs[label] = dc
-    dc.create(topo, sw_param)  # finally create the data center in our Mininet instance
+    **dc.create(topo, sw_param)**  # finally create the data center in our Mininet instance
     LOG.info("added data center: %s" % label)
     return dc
 
