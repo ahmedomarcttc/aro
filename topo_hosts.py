@@ -32,7 +32,7 @@ class Topology(DCNetwork):
 
     def _create_dcs(self):
         rm1 = ARORM(max_cu=4, max_mu=512)
-        rm2 = ARORM(max_cu=6, max_mu=512)
+        rm2 = ARORM(max_cu=8, max_mu=512)
 
         self.dc1 = self.addDatacenter("dc1")
         for sw in self.dc1.switch:
