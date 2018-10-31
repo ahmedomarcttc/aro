@@ -231,3 +231,26 @@ DC_COUNTER = 0
         self.net.rm_registrar.registerwithswitch(self, rm, sw)
         LOG.info("Assigned RM: %r to switch: %s DC: %r" % (rm, sw, self))
 ```
+###### Changes to /resourcemodel/__init__.py
+```
+class ResourceModelRegistrar(object):
+    .
+    .
+    .
+    def registerwithswitch(self, dc, rm, sw):
+        """
+        Register a new resource model.
+        :param dc: Data center to which it is assigned.
+        :param rm: The resource model object.
+        :param sw: a string of name of switch
+        :return: None
+        """
+        if dc in self._resource_models:
+            if sw in self._resource_models[dc]:
+                raise Exception(
+                    "There is already an resource model assigned to this DC.")
+        self._resource_models[dc] = { sw : rm }
+        rm.registrar = self
+        rm.dcs.append(dc)
+        LOG.info("Registrar: Added resource model: %r" % rm)
+```
