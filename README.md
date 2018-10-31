@@ -1,19 +1,19 @@
 # aro
-ARO Project
+## ARO Project
 
-For placement engine
+### For placement engine
 
-Changes to net.py
+###### Changes to net.py
 
-  def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_log_path=None):
-      if label in self.dcs:
-        raise Exception("Data center label already exists: %s" % label)
-      dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
-      dc.net = self  # set reference to network
-      self.dcs[label] = dc
-      dc.create(topo, sw_param)  # finally create the data center in our Mininet instance
-      LOG.info("added data center: %s" % label)
-      return dc
+    def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_log_path=None):
+        if label in self.dcs:
+          raise Exception("Data center label already exists: %s" % label)
+        dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
+        dc.net = self  # set reference to network
+        self.dcs[label] = dc
+        dc.create(topo, sw_param)  # finally create the data center in our Mininet instance
+        LOG.info("added data center: %s" % label)
+        return dc
 
     def addLink(self, node1, node2, \*\*params):
       # ensure type of node1
