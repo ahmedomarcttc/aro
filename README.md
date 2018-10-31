@@ -171,9 +171,22 @@ DC_COUNTER = 0
             connected_sw=conn_sw,
             **params
         )
-        .
-        .
-        .
+
+        # apply resource limits to container if a resource model is defined
+        if self._RM_switch[conn_sw.name] is not None:
+            print("This is the RM {}".format(self._RM_switch[conn_sw.name]))
+            try:
+                self._RM_switch[conn_sw.name].allocate(d)
+                self._RM_switch[conn_sw.name].write_allocation_log(
+                    d, self.resource_log_path)
+            except NotEnoughResourcesAvailable as ex:
+                LOG.warning(
+                    "Allocation of container %r was blocked by resource model." % name)
+                LOG.info(ex.message)
+                # ensure that we remove the container
+                self.net.removeDocker(name)
+                return None
+
         for nw in network:
             # clean up network configuration (e.g. RTNETLINK does not allow ':'
             # in intf names
