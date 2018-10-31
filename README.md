@@ -5,7 +5,7 @@ For placement engine
 
 Changes to net.py
 
-  def addDatacenter(self, label, topo=None, sw_param, metadata={}, resource_log_path=None):
+  def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_log_path=None):
       if label in self.dcs:
         raise Exception("Data center label already exists: %s" % label)
       dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
@@ -62,32 +62,19 @@ Changes to node.py
           Docker.__init__(self, name, dimage, **kwargs)
 
       def getNetworkStatus(self):
-          """
-          Helper method to receive information about the virtual networks
-          this compute instance is connected to.
-          """
-          # get all links and find dc switch interface
-          networkStatusList = []
-          for i in self.intfList():
-              vnf_name = self.name
-              vnf_interface = str(i)
-              dc_port_name = self.datacenter.net.find_connected_dc_interface(
-                  vnf_name, vnf_interface)
+
               # format list of tuples (name, Ip, MAC, isUp, status, dc_portname)
               intf_dict = {'intf_name': str(i), 'ip': "{0}/{1}".format(i.IP(), i.prefixLen), 'netmask': i.prefixLen,
-                           'mac': i.MAC(), 'up': i.isUp(), 'status': i.status(), 'dc_portname': dc_port_name,
-                           'Connect to switch': self.connected_sw.name}
-              networkStatusList.append(intf_dict)
+              'mac': i.MAC(), 'up': i.isUp(), 'status': i.status(), 'dc_portname': dc_port_name,
+              'Connect to switch': self.connected_sw.name}
 
-          return networkStatusList
 
     class Datacenter(object):
 
     DC_COUNTER = 0
         def __init__(self, label, metadata={}, resource_log_path=None):
-            self.net = None  # DCNetwork to which we belong
-            # each node (DC) has a short internal name used by Mininet
-            # this is caused by Mininets naming limitations for swtiches etc.
+            .
+            .
             Datacenter.DC_COUNTER += 1
             self.name = "dc%d" % Datacenter.DC_COUNTER
             # creating unique dpid for switches
@@ -98,6 +85,8 @@ Changes to node.py
             self.gw = None
             # pointer to assigned resource model
             self._resource_model = None
+            #add RM to individual switches
+            self._RM_switch = {}
 
         def _get_next_dc_dpid(self):
             self.counter += 1
@@ -107,20 +96,34 @@ Changes to node.py
             for i in range(numswitch):
                 self.switch.append(self.net.addSwitch("{}.s{}".format(self.name, i+1), dpid=hex(self._get_next_dc_dpid())[2:]))
                 LOG.debug("created data center switch: %s" % str(self.switch[i]))
-                self._RM_switch[str(self.switch[i])] = self.counter
+                self._RM_switch[self.switch[i].name] = None
                 self.net.addLink(self.gw, self.switch[i])
 
         def mesh_topo(self, numswitch):
             for i in range(numswitch):
                 self.switch.append(self.net.addSwitch("{}.s{}".format(self.name, i+1), dpid=hex(self._get_next_dc_dpid())[2:]))
                 LOG.debug("created data center switch: %s" % str(self.switch[i]))
-                self._RM_switch[str(self.switch[i])] = self.counter
+                self._RM_switch[self.switch[i].name] = None
                 self.net.addLink(self.gw, self.switch[i])
                 for j in range(i):
                     self.net.addLink(self.switch[j], self.switch[i])
 
         def grid_topo(self, grid_dim):
-            pass
+            for i in range(grid_dim[0]*grid_dim[1]):
+                self.switch.append(self.net.addSwitch("{}.s{}".format(self.name, i+1), dpid=hex(self._get_next_dc_dpid())[2:]))
+                LOG.debug("created data center switch: %s" % str(self.switch[i]))
+                self._RM_switch[self.switch[i].name] = None
+            for l in range(grid_dim[0]*grid_dim[1]):
+                if l != ((grid_dim[0]*grid_dim[1])-1):
+                    if (l % grid_dim[0]) == (grid_dim[0] - 1):
+                        self.net.addLink(self.switch[l], self.switch[l+grid_dim[0]])
+                    elif l >= (grid_dim[0]*(grid_dim[1] - 1)):
+                        self.net.addLink(self.switch[l], self.switch[l+1])
+                    else:
+                        self.net.addLink(self.switch[l], self.switch[l+grid_dim[0]])
+                        self.net.addLink(self.switch[l], self.switch[l+1])
+                else:
+                    self.net.addLink(self.gw, self.switch[l])
 
         def create(self, topo, sw_param):
             """
@@ -142,39 +145,22 @@ Changes to node.py
             else:
                 self.switch.append(self.net.addSwitch("{}.s1".format(self.name), dpid=hex(self._get_next_dc_dpid())[2:]))
                 LOG.debug("created data center switch: %s" % str(self.switch[0]))
+                self._RM_switch[self.switch[0].name] = None
                 self.net.addLink(self.gw, self.switch[0])
 
         def startCompute(self, name, image=None, command=None, network=None,
-                         flavor_name="tiny", connected_sw=None, properties=dict(), **params):
+                         flavor_name="tiny", conn_sw=None, properties=dict(), **params):
 
-            assert name is not None
-            # no duplications
-            if name in [c.name for c in self.net.getAllContainers()]:
-                raise Exception("Container with name %s already exists." % name)
-            # set default parameter
-            if image is None:
-                image = "ubuntu:trusty"
-            if network is None:
-                network = {}  # {"ip": "10.0.0.254/8"}
-            if isinstance(network, dict):
-                # if we have only one network, put it in a list
-                network = [network]
-            if isinstance(network, list):
-                if len(network) < 1:
-                    network.append({})
-
-            # apply hard-set resource limits=0
-            cpu_percentage = params.get('cpu_percent')
-            if cpu_percentage:
-                params['cpu_period'] = self.net.cpu_period
-                params['cpu_quota'] = self.net.cpu_period * float(cpu_percentage)
+            .
+            .
+            .
 
             env = properties
             properties['VNF_NAME'] = name
 
-            if connected_sw is None:
-                connected_sw = self.switch[0]
-            # connected_sw = switchselector(self.name)
+            if conn_sw is None:
+                conn_sw = self.switch[0]
+            # conn_sw = switchselector(self.name)
 
             # create the container
             d = self.net.addDocker(
@@ -184,11 +170,13 @@ Changes to node.py
                 datacenter=self,
                 flavor_name=flavor_name,
                 environment=env,
-                connected_sw=connected_sw,
+                connected_sw=conn_sw,
                 **params
             )
 
-
+            .
+            .
+            .
             # connect all given networks
             # if no --net option is given, network = [{}], so 1 empty dict in the list
             # this results in 1 default interface with a default ip address
@@ -208,36 +196,30 @@ Changes to node.py
 
         def stopCompute(self, name):
 
+            .
+            .
+            .
             # remove links
             self.net.removeLink(
                 link=None, node1=self.containers[name], node2=self.containers[name].connected_sw)
-
-            # remove container
-            self.net.removeDocker("%s" % (name))
-            del self.containers[name]
-
-            return True
+            .
+            .
+            .
 
         def attachExternalSAP(self, sap_name, sap_net, **params):
-            extSAP = EmulatorExtSAP(sap_name, sap_net, self, **params)
-            # link SAP to the DC switch
+
             self.net.addLink(extSAP.switch, self.gw, cls=Link)
-            self.extSAPs[sap_name] = extSAP
+
 
         def removeExternalSAP(self, sap_name):
-            sap_switch = self.extSAPs[sap_name].switch
-            # sap_switch = self.net.getNodeByName(sap_name)
-            # remove link of SAP to the DC switch
-            self.net.removeLink(link=None, node1=sap_switch, node2=self.gw)
-            self.net.removeExtSAP(sap_name)
-            del self.extSAPs[sap_name]
 
+            self.net.removeLink(link=None, node1=sap_switch, node2=self.gw)
+
+            .
+            .
+            .
         def getStatus(self):
-            """
-            Return a dict with status information about this DC.
-            """
-            container_list = [name for name in self.containers]
-            ext_saplist = [sap_name for sap_name in self.extSAPs]
+
             return {
                 "label": self.label,
                 "internalname": self.name,
