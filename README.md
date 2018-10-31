@@ -5,50 +5,50 @@
 
 ###### Changes to net.py
 
-´´´
-    def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_log_path=None):
-        if label in self.dcs:
-          raise Exception("Data center label already exists: %s" % label)
-        dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
-        dc.net = self  # set reference to network
-        self.dcs[label] = dc
-        dc.create(topo, sw_param)  # finally create the data center in our Mininet instance
-        LOG.info("added data center: %s" % label)
-        return dc
+```
+def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_log_path=None):
+    if label in self.dcs:
+      raise Exception("Data center label already exists: %s" % label)
+    dc = Datacenter(label, metadata=metadata, resource_log_path=resource_log_path)
+    dc.net = self  # set reference to network
+    self.dcs[label] = dc
+    dc.create(topo, sw_param)  # finally create the data center in our Mininet instance
+    LOG.info("added data center: %s" % label)
+    return dc
 
-    def addLink(self, node1, node2, \**params):
-      # ensure type of node1
-      if isinstance(node1, basestring):
-          if node1 in self.dcs:
-              node1 = self.dcs[node1].gw
-      if isinstance(node1, Datacenter):
-          node1 = node1.gw
-      # ensure type of node2
-      if isinstance(node2, basestring):
-          if node2 in self.dcs:
-              node2 = self.dcs[node2].gw
-      if isinstance(node2, Datacenter):
-          node2 = node2.gw
-      # try to give containers a default IP
+def addLink(self, node1, node2, **params):
+  # ensure type of node1
+  if isinstance(node1, basestring):
+      if node1 in self.dcs:
+          node1 = self.dcs[node1].gw
+  if isinstance(node1, Datacenter):
+      node1 = node1.gw
+  # ensure type of node2
+  if isinstance(node2, basestring):
+      if node2 in self.dcs:
+          node2 = self.dcs[node2].gw
+  if isinstance(node2, Datacenter):
+      node2 = node2.gw
+  # try to give containers a default IP
 
-    def startRyu(self, learning_switch=True):
+def startRyu(self, learning_switch=True):
 
-      ## aro ryu paths
-      ryu_path = dir_path + '/aro_simpleswitch_rest_13.py'
-      ryu_option0 = '--observe-links'
-      ryu_path2 = python_install_path + '/ryu/app/ofctl_rest.py'
-      # change the default Openflow controller port to 6653 (official IANA-assigned port number), as used by Mininet
-      # Ryu still uses 6633 as default
-      ryu_option = '--ofp-tcp-listen-port'
-      ryu_of_port = '6653'
-      ryu_cmd = 'ryu-manager'
-      FNULL = open("/tmp/ryu.log", 'w')
-      if learning_switch:
-          self.ryu_process = Popen(
-              [ryu_cmd, ryu_option0, ryu_option, ryu_of_port, ryu_path, ryu_path2], stdout=FNULL, stderr=FNULL)
-          LOG.debug('starting ryu-controller with {0}'.format(ryu_path))
-          LOG.debug('starting ryu-controller with {0}'.format(ryu_path2))
-´´´
+  ## aro ryu paths
+  ryu_path = dir_path + '/aro_simpleswitch_rest_13.py'
+  ryu_option0 = '--observe-links'
+  ryu_path2 = python_install_path + '/ryu/app/ofctl_rest.py'
+  # change the default Openflow controller port to 6653 (official IANA-assigned port number), as used by Mininet
+  # Ryu still uses 6633 as default
+  ryu_option = '--ofp-tcp-listen-port'
+  ryu_of_port = '6653'
+  ryu_cmd = 'ryu-manager'
+  FNULL = open("/tmp/ryu.log", 'w')
+  if learning_switch:
+      self.ryu_process = Popen(
+          [ryu_cmd, ryu_option0, ryu_option, ryu_of_port, ryu_path, ryu_path2], stdout=FNULL, stderr=FNULL)
+      LOG.debug('starting ryu-controller with {0}'.format(ryu_path))
+      LOG.debug('starting ryu-controller with {0}'.format(ryu_path2))
+```
 ###### Changes to node.py
 
     class EmulatorCompute(Docker):
