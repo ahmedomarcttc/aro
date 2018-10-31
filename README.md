@@ -216,4 +216,18 @@ DC_COUNTER = 0
             "vnf_list": container_list,
             "ext SAP list": ext_saplist
         }
+
+    def assignResourceModeltoSw(self, rm, sw):
+        """
+        Assign a resource model to switches of this DC.
+        :param rm: a BaseResourceModel object
+        :param sw: a string of name of switch
+        :return:
+        """
+        if self._RM_switch[sw] is not None:
+            raise Exception(
+                "There is already an resource model assigned to this Switch.")
+        self._RM_switch[sw] = rm
+        self.net.rm_registrar.registerwithswitch(self, rm, sw)
+        LOG.info("Assigned RM: %r to switch: %s DC: %r" % (rm, sw, self))
 ```
