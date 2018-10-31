@@ -5,6 +5,7 @@
 
 ###### Changes to net.py
 
+´´´
     def addDatacenter(self, label, topo=None, sw_param=None, metadata={}, resource_log_path=None):
         if label in self.dcs:
           raise Exception("Data center label already exists: %s" % label)
@@ -15,7 +16,7 @@
         LOG.info("added data center: %s" % label)
         return dc
 
-    def addLink(self, node1, node2, \*\*params):
+    def addLink(self, node1, node2, \**params):
       # ensure type of node1
       if isinstance(node1, basestring):
           if node1 in self.dcs:
@@ -47,19 +48,19 @@
               [ryu_cmd, ryu_option0, ryu_option, ryu_of_port, ryu_path, ryu_path2], stdout=FNULL, stderr=FNULL)
           LOG.debug('starting ryu-controller with {0}'.format(ryu_path))
           LOG.debug('starting ryu-controller with {0}'.format(ryu_path2))
-
-Changes to node.py
+´´´
+###### Changes to node.py
 
     class EmulatorCompute(Docker):
       def __init__(
-              self, name, dimage, **kwargs):
+              self, name, dimage, \**kwargs):
           self.datacenter = kwargs.get("datacenter")  # pointer to current DC
           self.flavor_name = kwargs.get("flavor_name")
           self.connected_sw = kwargs.get("connected_sw")
           LOG.debug("Starting compute instance %r in data center %r" %
                     (name, str(self.datacenter)))
           # call original Docker.__init__
-          Docker.__init__(self, name, dimage, **kwargs)
+          Docker.__init__(self, name, dimage, \**kwargs)
 
       def getNetworkStatus(self):
 
@@ -73,6 +74,7 @@ Changes to node.py
 
     DC_COUNTER = 0
         def __init__(self, label, metadata={}, resource_log_path=None):
+            .
             .
             .
             Datacenter.DC_COUNTER += 1
