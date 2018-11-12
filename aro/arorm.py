@@ -152,7 +152,7 @@ class ARORM(BaseResourceModel):
         e_cpu = self.registrar.e_cpu
         # calculate
         return float(
-            e_cpu) / sum([rm.dc_max_cu for rm in list(self.registrar.resource_models)])
+            e_cpu) / sum([rm.dc_max_cu for rm in list(self.registrar.resource_models_w_sw)])
 
     def _calculate_cpu_cfs_values(self, cpu_time_percentage):
         """
@@ -183,7 +183,7 @@ class ARORM(BaseResourceModel):
         e_mem = self.registrar.e_mem
         # calculate amount of memory for a single mu
         self.single_mu = float(
-            e_mem) / sum([rm.dc_max_mu for rm in list(self.registrar.resource_models)])
+            e_mem) / sum([rm.dc_max_mu for rm in list(self.registrar.resource_models_w_sw)])
         # calculate mem for given flavor
         mem_limit = self.single_mu * number_mu
         mem_limit = self._calculate_mem_limit_value(mem_limit)
@@ -216,11 +216,11 @@ class ARORM(BaseResourceModel):
         allocation_state = dict()
         for k, d in self._allocated_compute_instances.iteritems():
             s = dict()
-            s["cpu_period"] = d.cpu_period
-            s["cpu_quota"] = d.cpu_quota
-            s["cpu_shares"] = d.cpu_shares
-            s["mem_limit"] = d.mem_limit
-            s["memswap_limit"] = d.memswap_limit
+            s["cpu_period"] = d.resources['cpu_period']
+            s["cpu_quota"] = d.resources['cpu_quota']
+            s["cpu_shares"] = d.resources['cpu_shares']
+            s["mem_limit"] = d.resources['mem_limit']
+            s["memswap_limit"] = d.resources['memswap_limit']
             allocation_state[k] = s
         # final result
         r = dict()
