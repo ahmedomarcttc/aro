@@ -31,8 +31,8 @@ class Topology(DCNetwork):
         self._connect_aro()
 
     def _create_dcs(self):
-        rm1 = ARORM(max_cu=4, max_mu=512)
-        rm2 = ARORM(max_cu=8, max_mu=512)
+        rm1 = ARORM(max_cu=10, max_mu=1024)
+        rm2 = ARORM(max_cu=10, max_mu=1024)
 
         self.dc1 = self.addDatacenter("dc1")
         for sw in self.dc1.switch:
@@ -60,8 +60,8 @@ class Topology(DCNetwork):
 
         self.vnf2 = self.dc2.startCompute(
             'vnf2',
-            network = [{'id' : 'intf1', 'ip' : '10.0.10.2/24'}]
-            # flavor_name = 'medium'
+            network = [{'id' : 'intf1', 'ip' : '10.0.10.2/24'}],
+            flavor_name = 'large'
             )
 
     def _connect_aro(self):
