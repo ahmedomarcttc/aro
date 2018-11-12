@@ -43,15 +43,19 @@ class Topology(DCNetwork):
         for sw in self.dc2.switch:
             self.dc2.assignResourceModeltoSw(rm2, sw.name)
         print(self.dc2._RM_switch)
-        # self.dc3 = self.addDatacenter("dc3", topo='mesh', sw_param=3)
-        # self.dc4 = self.addDatacenter("dc4", topo='grid', sw_param=[3,4])
-        # self.dc5 = self.addDatacenter("dc5", topo='tree', numswitch=3)
+
+    def _create_switches(self):
+        self.sw1 = self.addSwitch("sw1", dpid=hex(self._get_next_dpid())[2:])
+
+    def _create_links(self):
+        self.addLink(self.dc1, self.sw1)
+        self.addLink(self.dc2, self.sw1)
 
     def _create_vnfhosts(self):
         self.vnf1 = self.dc1.startCompute(
             'vnf1',
-            network = [{'id' : 'intf1', 'ip' : '10.0.10.1/24'}]
-            # flavor_name = 'medium'
+            network = [{'id' : 'intf1', 'ip' : '10.0.10.1/24'}],
+            flavor_name = 'medium'
             )
 
         self.vnf2 = self.dc2.startCompute(
@@ -60,21 +64,10 @@ class Topology(DCNetwork):
             # flavor_name = 'medium'
             )
 
-    def _create_switches(self):
-        self.sw1 = self.addSwitch("sw1", dpid=hex(self._get_next_dpid())[2:])
-
-    def _create_links(self):
-        self.addLink(self.dc1, self.sw1)
-        self.addLink(self.dc2, self.sw1)
-        # self.addLink(self.dc3, self.sw1)
-        # self.addLink(self.dc4, self.sw1)
-
     def _connect_aro(self):
         self.aro = Endpoint("0.0.0.0", 2284, DCnetwork=self)
         self.aro.connectVIM(self.dc1)
         self.aro.connectVIM(self.dc2)
-        # self.aro.connectVIM(self.dc3)
-        # self.aro.connectVIM(self.dc4)
 
     def start_topo(self):
         self.start()
