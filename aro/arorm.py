@@ -66,6 +66,7 @@ class ARORM(BaseResourceModel):
             raise NotEnoughResourcesAvailable(
                 "Not enough compute resources left.")
         self.dc_alloc_cu += fl_cu
+        print(self.dc_max_cu - self.dc_alloc_cu)
 
     def _allocate_mem(self, d):
         """
@@ -79,6 +80,7 @@ class ARORM(BaseResourceModel):
             raise NotEnoughResourcesAvailable(
                 "Not enough memory resources left.")
         self.dc_alloc_mu += fl_mu
+        print(self.dc_max_mu - self.dc_alloc_mu)
 
     def free(self, d):
         """
