@@ -30,18 +30,24 @@ class Topology(DCNetwork):
         self._create_vnfhosts()
         self._connect_aro()
 
-    def _create_dcs(self):
-        rm1 = ARORM(max_cu=10, max_mu=1024)
-        rm2 = ARORM(max_cu=10, max_mu=1024)
+    def _create_RM(self, cpu, ram):
+        return ARORM(max_cu=cpu, max_mu=ram)
 
-        self.dc1 = self.addDatacenter("dc1")
+
+    def _create_dcs(self):
+        # rm1 = ARORM(max_cu=10, max_mu=1024)
+        # rm2 = ARORM(max_cu=10, max_mu=1024)
+
+        self.dc1 = self.addDatacenter("pop1")
         for sw in self.dc1.switch:
-            self.dc1.assignResourceModeltoSw(rm1, sw.name)
+            self.dc1.assignResourceModeltoSw(
+                        self._create_RM(10, 1024), sw.name)
         print(self.dc1._RM_switch)
 
         self.dc2 = self.addDatacenter("dc2", topo='star', sw_param=3)
         for sw in self.dc2.switch:
-            self.dc2.assignResourceModeltoSw(rm2, sw.name)
+            self.dc2.assignResourceModeltoSw(
+                        self._create_RM(10, 1024), sw.name)
         print(self.dc2._RM_switch)
 
     def _create_switches(self):
