@@ -42,13 +42,11 @@ class Topology(DCNetwork):
         for sw in self.dc1.switch:
             self.dc1.assignResourceModeltoSw(
                         self._create_RM(10, 1024), sw.name)
-        print(self.dc1._RM_switch)
 
         self.dc2 = self.addDatacenter("dc2", topo='star', sw_param=3)
         for sw in self.dc2.switch:
             self.dc2.assignResourceModeltoSw(
                         self._create_RM(10, 1024), sw.name)
-        print(self.dc2._RM_switch)
 
     def _create_switches(self):
         self.sw1 = self.addSwitch("sw1", dpid=hex(self._get_next_dpid())[2:])
