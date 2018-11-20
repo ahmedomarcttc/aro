@@ -35,18 +35,13 @@ class Topology(DCNetwork):
 
 
     def _create_dcs(self):
-        # rm1 = ARORM(max_cu=10, max_mu=1024)
-        # rm2 = ARORM(max_cu=10, max_mu=1024)
-
         self.dc1 = self.addDatacenter("pop1")
         for sw in self.dc1.switch:
-            self.dc1.assignResourceModeltoSw(
-                        self._create_RM(10, 1024), sw.name)
+            self.dc1.assignResourceModeltoSw(self._create_RM(10, 1024), sw.name)
 
         self.dc2 = self.addDatacenter("dc2", topo='star', sw_param=3)
         for sw in self.dc2.switch:
-            self.dc2.assignResourceModeltoSw(
-                        self._create_RM(10, 1024), sw.name)
+            self.dc2.assignResourceModeltoSw(self._create_RM(10, 1024), sw.name)
 
     def _create_switches(self):
         self.sw1 = self.addSwitch("sw1", dpid=hex(self._get_next_dpid())[2:])
