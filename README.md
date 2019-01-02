@@ -67,7 +67,7 @@ class EmulatorCompute(Docker):
           # format list of tuples (name, Ip, MAC, isUp, status, dc_portname)
           intf_dict = {'intf_name': str(i), 'ip': "{0}/{1}".format(i.IP(), i.prefixLen), 'netmask': i.prefixLen,
           'mac': i.MAC(), 'up': i.isUp(), 'status': i.status(), 'dc_portname': dc_port_name,
-          'Connected_switch': self.connected_sw.name}
+          'connected_switch': self.connected_sw.name}
 
 class Datacenter(object):
 
