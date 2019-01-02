@@ -272,4 +272,12 @@ class ResourceModelRegistrar(object):
         rm.registrar = self
         rm.dcs.append(dc)
         LOG.info("Registrar: Added resource model: %r" % rm)
+
+        @property
+        def resource_models_w_sw(self):
+            """
+            List of registered resource models
+            :return:
+            """
+            return list(self._resource_models_w_sw.itervalues())
 ```
