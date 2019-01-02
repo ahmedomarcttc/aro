@@ -202,6 +202,12 @@ DC_COUNTER = 0
         .
         .
         .
+        # call _RM_switch resource model and free resources
+        if self._RM_switch[self.containers[name].connected_sw.name] is not None:
+            self._RM_switch[self.containers[name]].free(self.containers[name])
+            self._RM_switch[self.containers[name]].write_free_log(
+                self.containers[name], self.resource_log_path)
+
         # remove links
         self.net.removeLink(
             link=None, node1=self.containers[name], node2=self.containers[name].connected_sw)
