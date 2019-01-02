@@ -253,6 +253,10 @@ DC_COUNTER = 0
 ###### Changes to /resourcemodel/__init__.py
 ```
 class ResourceModelRegistrar(object):
+    def __init__(self, dc_emulation_max_cpu, dc_emulation_max_mem):
+        # pointer to all resource models assigned to DCs
+        self._resource_models = dict()
+        self._resource_models_w_sw = dict()
     .
     .
     .
