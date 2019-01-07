@@ -174,7 +174,6 @@ DC_COUNTER = 0
 
         # apply resource limits to container if a resource model is defined
         if self._RM_switch[conn_sw.name] is not None:
-            print("This is the RM {}".format(self._RM_switch[conn_sw.name]))
             try:
                 self._RM_switch[conn_sw.name].allocate(d)
                 self._RM_switch[conn_sw.name].write_allocation_log(
