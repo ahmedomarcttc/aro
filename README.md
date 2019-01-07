@@ -268,11 +268,12 @@ class ResourceModelRegistrar(object):
         :param sw: a string of name of switch
         :return: None
         """
-        if dc in self._resource_models:
-            if sw in self._resource_models[dc]:
+        if dc in self._resource_models_w_sw:
+            if sw in self._resource_models_w_sw[dc]:
                 raise Exception(
-                    "There is already an resource model assigned to this DC.")
-        self._resource_models[dc] = { sw : rm }
+                    "There is already an resource model assigned to the switch in this DC.")
+        self._resource_models[sw] = rm
+        self._resource_models_w_sw[dc] = self._resource_models
         rm.registrar = self
         rm.dcs.append(dc)
         LOG.info("Registrar: Added resource model: %r" % rm)
@@ -283,5 +284,6 @@ class ResourceModelRegistrar(object):
         List of registered resource models
         :return:
         """
-        return list(self._resource_models_w_sw.itervalues())
+        return list(self._resource_models.itervalues())
+
 ```

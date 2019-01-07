@@ -132,7 +132,7 @@ class ARORM(BaseResourceModel):
         """
         number_cu = self._get_flavor(d).get("compute")
         # calculate cpu time fraction of a single compute unit
-        self.single_cu = self._compute_single_cu()
+        self.single_cu = self._compute_single_cu(d)
         # calculate cpu time fraction for container with given flavor
         cpu_time_percentage = self.single_cu * number_cu
         # calculate input values for CFS scheduler bandwidth limitation
@@ -145,7 +145,7 @@ class ARORM(BaseResourceModel):
             d.updateCpuLimit(cpu_period=int(cpu_period),
                              cpu_quota=int(cpu_quota))
 
-    def _compute_single_cu(self):
+    def _compute_single_cu(self, d):
         """
         Calculate percentage of CPU time of a singe CU unit.
         :return:
