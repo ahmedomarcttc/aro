@@ -105,9 +105,9 @@ class topo(DCNetwork):
         for api in self.api_OS:
             api.start()
         self.start()
-        self.setChain('vnf1', 'vnf2', 'intf1', 'intf1', cmd='add-flow', bidirectional=True)
-
-
+        self.setChain('vnf1', 'vnf2', cmd='add-flow')
+        self.setChain('vnf2', 'vnf1', cmd='add-flow')
+        
     def stop_topology(self):
         for api in self.api_OS:
             api.stop()
