@@ -100,10 +100,13 @@ class topo(DCNetwork):
         self._create_openstack_api_endpoints()
         self.testvnf()
 
+
     def start_topology(self):
         for api in self.api_OS:
             api.start()
         self.start()
+        self.setChain('vnf1', 'vnf2', 'intf1', 'intf1', cmd='add-flow', bidirectional=True)
+
 
     def stop_topology(self):
         for api in self.api_OS:
